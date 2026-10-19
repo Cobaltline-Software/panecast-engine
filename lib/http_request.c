@@ -226,16 +226,16 @@ http_request_init(void)
 
     llhttp_init(&request->parser, HTTP_REQUEST, &request->parser_settings);
     request->parser.data = request;
-	request->url = NULL;
-	request->url_len = 0;
-	request->protocol_len = 0;
-	request->version_len = 0;
-	request->headers = NULL;
-	request->headers_index = 0;
-	request->headers_size = 0;
-	request->data = NULL;
-	request->datalen = 0;
-	request->complete = 0;
+    request->url = NULL;
+    request->url_len = 0;
+    request->protocol_len = 0;
+    request->version_len = 0;
+    request->headers = NULL;
+    request->headers_index = 0;
+    request->headers_size = 0;
+    request->data = NULL;
+    request->datalen = 0;
+    request->complete = 0;
     request->is_reverse = false;
     assert(sizeof(request->protocol) > 8);
     memset(request->protocol, '\0', sizeof(request->protocol)); 
@@ -273,6 +273,10 @@ http_request_add_data(http_request_t *request, const char *data, int datalen)
     if (ret == HPE_PAUSED_UPGRADE) {
         /* support for "Upgrade" to reverse http ("PTTH/1.0") protocol */
         llhttp_resume_after_upgrade(&request->parser);
+        request->is_reverse = true;
+        if (request->datalen > 0 && request->data) {
+            memset(request->data, 0, request->datalen);
+        }
     }
     return ret;
 }
